@@ -1,0 +1,152 @@
+*****Instalar Laravel*****
+
+composer create-project laravel/laravel exmaple-app
+
+*****Entrar a la pagina creada*****
+
+localhost/example-app/public/
+
+
+*****Configurar Base de datos*****
+
+entrar a la carpeta .env y buscar DB_CONNECTION=mysql y confuiguar con tus datos
+
+
+*****Hacer las migraciones*****
+
+cd example-app
+php artisan migrate
+
+*****Crear un modelo paa la tabla Empleado*****
+php artisan make:model Empeado -mcr
+
+Se crea un MVC dentro de la carpeta app/Http y app/Models
+
+*****Declara campos para la tabla empleados*****
+
+Entrar a database/nigrations/
+
+y crear los campos para la tabla empleados:
+    $table->string('Nombre');
+    $table->string('ApellidoPaterno');
+    $table->string('ApellidoMaterno');
+    $table->string('Correo');
+    $table->string('Foto');
+
+una ves terminado volvemos a migrar
+
+php artisan migrate
+
+****Por error en migracion*****
+
+entrar a app/Providers/AppServiceProvider.php
+
+use Illuminate\Support\Facades\Schema;
+
+public function boot()
+{
+    Schema::defaultStringLength(191);
+}
+
+Cambiarn el id por 
+$table->bigIncrements('id');
+
+php artisan migrate:fresh
+
+
+****Carpeta Views*****
+
+app/resources/Views
+
+****Rutas*****
+
+ap/routes/web.php
+
+
+*****Acceder a cada una de las vistas*****
+
+/*Route::get('/empleado', function () {
+    return view('empleado.index');  //accede a los elementos de views/empleado
+});
+
+****Acceder desde coontrollers*****
+
+ir a ap/Http/Controlles/EmpleadoController
+
+
+public function create()
+    {
+        //
+        return view('empleado.create');
+    }
+
+****Acceder en desde la ruta al controlador****
+
+en web.php
+
+use App\Http\Controllers\EmpleadoController;
+
+Route::get('empleado/create', [EmpleadoController::class, 'create']);  */  Comentar todo esto porque ya no sirve
+
+****Acceder a todas las rutas****
+
+en web.php
+Route::resource('empleado', EmpeadoController::class);
+
+Con esto ya configuramos todas las rutas y podemos comentar el codigo anterior configurado de las rutas
+
+****Saber rutas activas y sus metodos de envio de datos****
+
+ php artisan route:list
+
+ **** Generar link para ver imagenes****
+
+ php artisan storage:link 
+
+ ***** Crear Autenticaciones*****
+
+ composer require laravel/ui
+ php artisan ui bootstrap --auth
+ npm install (hay que tener node.js instalado)
+ npm run dev
+
+ **** Hacer que cargue login primero*****
+
+ cambianr en web.php
+ Route::get('/', function () {
+    return view('auth.login');
+});
+
+
+Route::get('/home', [EmpeadoController::class, 'index'])->name('home');
+
+// una ves logeado redireccionar al crud
+Route::group(['middleware'=>'auth'],function () {
+    Route::get('/home', [EmpeadoController::class, 'index'])->name('home');
+});
+
+****Agregar un boton en el nav*****
+
+entrar en sistema/resources/views/layout
+
+ <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('empleado.index') }}">{{ __('Empleados') }}</a>
+                        </li>
+                    </ul>
+
+
+****Paginacion****
+
+ir a app/Providers/AppServiceProvider
+
+use Illuminate\Pagination\Paginator;
+
+ public function boot()
+    {
+        Paginator::useBootstrap();
+    }
+
+Despues ir al index.blade.php para mostrar la Paginacion
+
+{!! $empleados->links() !!}
